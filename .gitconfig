@@ -1,0 +1,64 @@
+# Command to add .gitconfig to your install: git config --local include.path ../.gitconfig
+
+[user]
+	name = Andy
+	email = info@andylynk.com
+[credential]
+	helper = manager
+
+[alias] 
+    # The following are helper functions pilfered from: https://gist.github.com/pksunkara/988716
+    ai = add -i
+    #############   
+	cp = cherry-pick
+	cpa = cherry-pick --abort
+	cpc = cherry-pick --continue
+    #############
+	m = merge
+	ma = merge --abort
+	mc = merge --continue
+	ms = merge --skip
+    #############
+	rb = rebase
+	rba = rebase --abort
+	rbc = rebase --continue
+	rbi = rebase --interactive
+	rbs = rebase --skip
+    #############
+	ps = push
+	psf = push -f
+	psu = push -u
+	pst = push --tags
+    # Helper functions 
+    branch-name = !git rev-parse --abbrev-ref HEAD
+    short-branch-name = !git branch-name | sed -E 's/.*\\///g'
+    publish = !git push -u origin $(git branch-name)
+    new-moneybox-branch = !git checkout $1 && git pull && git checkout -b $2/$3 && git publish && :
+    
+    # Branch management functions
+    epic-branch = !git new-moneybox-branch master epic $1 # Creates a new branch from master, with the format epic/<branch-name>
+    feature-branch = !git new-moneybox-branch master feature $1 # Creates a new branch from master, with the format feature/<branch-name>
+    bug-branch = !git new-moneybox-branch master bug $1 # Creates a new branch from master, with the format bug/<branch-name>
+    technical-branch = !git new-moneybox-branch master technical $1 # Creates a new branch from master with the format technical/<branch-name>
+    dev-merge-branch = !git --no-pager log --oneline -n 10 && git new-moneybox-branch develop devmerge $(git short-branch-name) # Creates a branch from develop, with the format devmerge/<current-branch-short-name>
+    dev-merge-branch-cp = "!f() { branchname=$(git branch-name); git --no-pager log --oneline -n 10; git new-moneybox-branch develop devmerge $(git short-branch-name); git cherry-pick ${branchname}; }; f"  # Creates a branch from develop, with the format devmerge/<current-branch-short-name> and then cherry picks the top commit from the current branch
+    master-merge-branch = !git new-moneybox-branch master mastermerge $(git short-branch-name) # Creates a branch from master, with the format master/<current-branch-short-name>
+    master-merge-branch-cp = "!f() { branchname=$(git branch-name); git --no-pager log --oneline -n 10; git new-moneybox-branch master mastermerge $(git short-branch-name); git cherry-pick ${branchname}; }; f"  # Creates a branch from master, with the format mastermerge/<current-branch-short-name> and then cherry picks the top commit from the current branch
+	drb = "!f() { branchname=$(git branch-name); git checkout develop; git pull; git checkout ${branchname}; git pull; git rebase origin/develop; }; f" # develop rebase with pulls -> git drb
+    dev-rebase = !git drb
+	mrb = "!f() { branchname=$(git branch-name); git checkout master; git pull; git checkout ${branchname}; git pull; git rebase origin/master; }; f" # master rebase with pulls -> git mrb
+    master-rebase = !git mrb
+
+    ## Switches between devmerge and feature branches
+    switch-devmerge-branch = !git --no-pager log --oneline -n 10 && git checkout devmerge/$(git short-branch-name)
+    switch-feature-branch = !git checkout feature/$(git short-branch-name)
+
+    ## Opens GitHub on the correct page to request a PR
+    dev-pull = !git psf && git web--browse https://github.com/MoneyBox/MoneyBox-Api/compare/develop...$(git branch-name)
+    master-pull = !git psf && git web--browse https://github.com/MoneyBox/MoneyBox-Api/compare/master...$(git branch-name)
+    
+    # Misc functions
+    add-commit = !git add -A && git commit # Adds all files and commits with a message -> git add-commit -m "My commit message"
+    
+    
+

@@ -36,6 +36,8 @@ namespace Snake
         public UnityEvent onFirstInput;
         public UnityEvent onScore;
 
+        // test comment
+
         #region Initialise
         private void Start()
         {
